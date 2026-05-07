@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"D:\\\\cldtst\\\\ProjetoJQUERY_2026-1\\\\css\")",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"D:\\\\cldtst\\\\ProjetoJQUERY_2026-1\\\\js\")"
+    ]
+  }
+}

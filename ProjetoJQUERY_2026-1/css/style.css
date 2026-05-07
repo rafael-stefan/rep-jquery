@@ -1,0 +1,375 @@
+/* ============================================================
+   CSS customizado - complementa o Bootstrap
+   ============================================================ */
+
+:root {
+    --cor-primaria: #4f46e5;
+    --cor-primaria-dark: #3730a3;
+    --cor-navbar-inicio: #1e1b4b;
+    --cor-navbar-fim: #4f46e5;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    background-color: #f1f5f9;
+    color: #1e293b;
+    min-height: 100vh;
+}
+
+/* --- Navbar --- */
+
+.navbar {
+    background: linear-gradient(135deg, var(--cor-navbar-inicio), var(--cor-navbar-fim));
+    padding: 14px 0;
+    box-shadow: 0 4px 20px rgba(79, 70, 229, 0.35);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: 0.3px;
+}
+
+.navbar-brand i {
+    color: #a5b4fc;
+}
+
+/* --- Cards --- */
+
+.card {
+    border: none;
+    border-radius: 14px;
+}
+
+.card-form .card-header {
+    background: linear-gradient(135deg, var(--cor-navbar-inicio), var(--cor-navbar-fim));
+    color: #fff;
+    border-radius: 14px 14px 0 0 !important;
+    padding: 16px 24px;
+    font-size: 1rem;
+}
+
+.card-form .card-header i {
+    color: #a5b4fc;
+}
+
+.card-body {
+    padding: 26px;
+}
+
+/* --- Inputs e selects --- */
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+    border: 1.5px solid #cbd5e1;
+    font-size: 0.93rem;
+    padding: 9px 13px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: 'Inter', sans-serif;
+    color: #1e293b;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.form-label {
+    font-size: 0.85rem;
+    color: #475569;
+    margin-bottom: 5px;
+}
+
+textarea.form-control {
+    resize: vertical;
+}
+
+/* Campo observacao criado dinamicamente */
+#campo-observacao {
+    background: #f8fafc;
+    border: 1.5px dashed #94a3b8;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+    animation: slideDown 0.25s ease;
+}
+
+#campo-observacao label {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Validacao --- */
+
+.form-control.input-erro {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.erro-msg {
+    display: none;
+    color: #dc2626;
+    font-size: 0.82rem;
+    margin-top: 5px;
+    font-weight: 500;
+}
+
+.erro-msg.visivel {
+    display: block;
+}
+
+/* --- Botoes --- */
+
+#btn-observacao {
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+#btn-observacao.btn-obs-ativo {
+    background-color: #fee2e2;
+    border-color: #fca5a5;
+    color: #dc2626;
+}
+
+#btn-concluir {
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    background-color: #059669;
+    border-color: #059669;
+    letter-spacing: 0.2px;
+}
+
+#btn-concluir:hover {
+    background-color: #047857;
+    border-color: #047857;
+}
+
+/* --- Card de filtros --- */
+
+.card-filtros .card-header {
+    background: #f8fafc;
+    border-bottom: 1.5px solid #e2e8f0;
+    border-radius: 14px 14px 0 0 !important;
+    padding: 14px 22px;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card-filtros .card-body {
+    padding: 18px 22px;
+}
+
+#btn-filtrar {
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-size: 0.88rem;
+    background-color: var(--cor-primaria);
+    border-color: var(--cor-primaria);
+}
+
+#btn-filtrar:hover {
+    background-color: var(--cor-primaria-dark);
+    border-color: var(--cor-primaria-dark);
+}
+
+/* --- Tabela --- */
+
+.tabela-wrapper {
+    border-radius: 0 0 14px 14px;
+    overflow: hidden;
+}
+
+#tabela-tarefas {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    transition: opacity 0.3s;
+}
+
+#tabela-tarefas.filtrando {
+    opacity: 0.4;
+}
+
+#tabela-tarefas thead tr {
+    background: linear-gradient(135deg, var(--cor-navbar-inicio), var(--cor-navbar-fim));
+}
+
+#tabela-tarefas thead th {
+    color: #c7d2fe;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 600;
+    padding: 14px 16px;
+    border: none;
+    white-space: nowrap;
+}
+
+#tabela-tarefas tbody td {
+    padding: 13px 16px;
+    vertical-align: middle;
+    border-color: #f1f5f9;
+    color: #334155;
+}
+
+#tabela-tarefas tbody tr {
+    transition: background-color 0.15s;
+    cursor: pointer;
+}
+
+#tabela-tarefas tbody tr:hover {
+    background-color: #eef2ff;
+}
+
+/* Linha concluida */
+.linha-concluida td {
+    color: #94a3b8;
+    text-decoration: line-through;
+}
+
+/* Animacao de linha atualizada */
+.linha-atualizada {
+    animation: highlightRow 1.3s ease;
+}
+
+@keyframes highlightRow {
+    0%   { background-color: #d1fae5; }
+    100% { background-color: transparent; }
+}
+
+/* Animacao de remocao */
+.removendo {
+    animation: fadeOutRow 0.35s ease forwards;
+    pointer-events: none;
+}
+
+@keyframes fadeOutRow {
+    to { opacity: 0; transform: translateX(30px); }
+}
+
+/* Sem resultados */
+.sem-resultados {
+    text-align: center;
+    color: #94a3b8;
+    font-style: italic;
+    padding: 36px !important;
+    font-size: 0.95rem;
+}
+
+/* --- Badges customizados --- */
+
+.badge-prio-baixa {
+    background-color: #dcfce7;
+    color: #166534;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 5px 11px;
+    border-radius: 20px;
+}
+
+.badge-prio-media {
+    background-color: #fef9c3;
+    color: #854d0e;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 5px 11px;
+    border-radius: 20px;
+}
+
+.badge-prio-alta {
+    background-color: #fee2e2;
+    color: #991b1b;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 5px 11px;
+    border-radius: 20px;
+}
+
+.badge-pendente {
+    background-color: #dbeafe;
+    color: #1e40af;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 5px 11px;
+    border-radius: 20px;
+}
+
+.badge-concluida {
+    background-color: #d1fae5;
+    color: #065f46;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 5px 11px;
+    border-radius: 20px;
+}
+
+/* Botoes da tabela */
+.btn-editar-row {
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 5px 12px;
+    background-color: #f59e0b;
+    border-color: #f59e0b;
+    color: #fff;
+    transition: background-color 0.2s;
+}
+
+.btn-editar-row:hover {
+    background-color: #d97706;
+    border-color: #d97706;
+    color: #fff;
+}
+
+.btn-excluir-row {
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 5px 12px;
+    background-color: #ef4444;
+    border-color: #ef4444;
+    color: #fff;
+    transition: background-color 0.2s;
+}
+
+.btn-excluir-row:hover {
+    background-color: #dc2626;
+    border-color: #dc2626;
+    color: #fff;
+}
+
+/* Contador nav */
+#contador-nav {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+/* Responsivo */
+@media (max-width: 576px) {
+    .card-body {
+        padding: 18px;
+    }
+
+    #tabela-tarefas thead th,
+    #tabela-tarefas tbody td {
+        padding: 10px 10px;
+        font-size: 0.8rem;
+    }
+}
