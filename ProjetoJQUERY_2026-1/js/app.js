@@ -36,17 +36,19 @@ function adicionarTarefa(dados) {
 }
 
 function atualizarTarefa(id, dadosAtualizados) {
-    var index = tarefas.findIndex(function(t) { return t.id === id; });
+    var index = -1;
+    for (var i = 0; i < tarefas.length; i++) {
+        if (tarefas[i].id === id) {
+            index = i;
+        }
+    }
     if (index !== -1) {
-        tarefas[index] = {
-            id: tarefas[index].id,
-            titulo: dadosAtualizados.titulo,
-            descricao: dadosAtualizados.descricao,
-            prioridade: dadosAtualizados.prioridade,
-            dataLimite: dadosAtualizados.dataLimite,
-            status: dadosAtualizados.status,
-            observacao: dadosAtualizados.observacao
-        };
+        tarefas[index].titulo = dadosAtualizados.titulo;
+        tarefas[index].descricao = dadosAtualizados.descricao;
+        tarefas[index].prioridade = dadosAtualizados.prioridade;
+        tarefas[index].dataLimite = dadosAtualizados.dataLimite;
+        tarefas[index].status = dadosAtualizados.status;
+        tarefas[index].observacao = dadosAtualizados.observacao;
         salvarTarefas();
         return tarefas[index];
     }
@@ -54,20 +56,42 @@ function atualizarTarefa(id, dadosAtualizados) {
 }
 
 function excluirTarefa(id) {
-    tarefas = tarefas.filter(function(t) { return t.id !== id; });
+    for (var i = 0; i < tarefas.length; i++) {
+        if (tarefas[i].id === id) {
+            tarefas.splice(i, 1);
+            break;
+        }
+    }
     salvarTarefas();
 }
 
 function filtrarTarefas(status, prioridade) {
-    return tarefas.filter(function(t) {
-        var matchStatus = (status === '' || t.status === status);
-        var matchPrioridade = (prioridade === '' || t.prioridade === prioridade);
-        return matchStatus && matchPrioridade;
-    });
+    var resultado = [];
+    for (var i = 0; i < tarefas.length; i++) {
+        var tarefa = tarefas[i];
+        var passouStatus = false;
+        var passouPrioridade = false;
+
+        if (status === '' || tarefa.status === status) {
+            passouStatus = true;
+        }
+        if (prioridade === '' || tarefa.prioridade === prioridade) {
+            passouPrioridade = true;
+        }
+        if (passouStatus && passouPrioridade) {
+            resultado.push(tarefa);
+        }
+    }
+    return resultado;
 }
 
 function getTarefaById(id) {
-    return tarefas.find(function(t) { return t.id === id; });
+    for (var i = 0; i < tarefas.length; i++) {
+        if (tarefas[i].id === id) {
+            return tarefas[i];
+        }
+    }
+    return null;
 }
 
 function setEditandoId(id) {

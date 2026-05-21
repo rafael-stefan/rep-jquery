@@ -52,3 +52,9 @@ body {
     color: green;
     font-weight: bold;
 }
+
+#btn-observacao.btn-ativo {
+    background-color: #dc3545;
+    color: #fff;
+    border-color: #dc3545;
+}

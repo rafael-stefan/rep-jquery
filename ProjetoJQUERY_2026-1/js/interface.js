@@ -1,33 +1,25 @@
-var prioridadeLabel = { Baixa: 'Baixa', Media: 'Media', Alta: 'Alta' };
-var prioridadeBadge = {
-    Baixa: 'badge-prio-baixa',
-    Media: 'badge-prio-media',
-    Alta:  'badge-prio-alta'
-};
-
 $(function () {
+
     carregarTarefas();
     atualizarContadorNav();
     if (tarefas.length > 0) {
         criarSecaoLista();
-        $.each(tarefas, function (i, tarefa) {
-            adicionarLinhaTabela(tarefa);
-        });
+        for (var i = 0; i < tarefas.length; i++) {
+            adicionarLinhaTabela(tarefas[i]);
+        }
     }
 
     $('#btn-observacao').on('click', function () {
+        $(this).toggleClass('btn-ativo');
         if ($('#campo-observacao').length === 0) {
-            var novoCampo = $(
+            $('#campo-observacao-container').append(
                 '<div id="campo-observacao" class="mb-3">' +
                     '<label class="form-label">Observacao</label>' +
                     '<textarea id="observacao" class="form-control" rows="2" placeholder="Digite uma observacao..."></textarea>' +
                 '</div>'
             );
-            $('#campo-observacao-container').append(novoCampo);
-            $(this).text('- Observacao');
         } else {
             $('#campo-observacao').remove();
-            $(this).text('+ Observacao');
         }
     });
 
@@ -37,11 +29,13 @@ $(function () {
         var titulo = $('#titulo').val().trim();
 
         if (!titulo) {
-            $('#erro-titulo').text('O titulo e obrigatorio!').addClass('visivel');
+            $('#erro-titulo').text('O titulo e obrigatorio!');
+            $('#erro-titulo').addClass('visivel');
             $('#titulo').addClass('input-erro');
             return;
         }
-        $('#erro-titulo').text('').removeClass('visivel');
+        $('#erro-titulo').text('');
+        $('#erro-titulo').removeClass('visivel');
         $('#titulo').removeClass('input-erro');
 
         var observacao = '';
@@ -50,11 +44,11 @@ $(function () {
         }
 
         var dados = {
-            titulo:     titulo,
-            descricao:  $('#descricao').val().trim(),
+            titulo: titulo,
+            descricao: $('#descricao').val().trim(),
             prioridade: $('#prioridade').val(),
             dataLimite: $('#dataLimite').val(),
-            status:     $('#status').val(),
+            status: $('#status').val(),
             observacao: observacao
         };
 
@@ -96,7 +90,7 @@ $(function () {
     });
 
     $(document).on('click', '#btn-filtrar', function () {
-        var statusFiltro     = $('#filtro-status').val();
+        var statusFiltro = $('#filtro-status').val();
         var prioridadeFiltro = $('#filtro-prioridade').val();
 
         var resultado = filtrarTarefas(statusFiltro, prioridadeFiltro);
@@ -108,15 +102,23 @@ $(function () {
                 '<tr><td colspan="7" class="sem-resultados">Nenhuma tarefa encontrada com esses filtros.</td></tr>'
             );
         } else {
-            $.each(resultado, function (i, tarefa) {
-                adicionarLinhaTabela(tarefa);
-            });
+            for (var i = 0; i < resultado.length; i++) {
+                adicionarLinhaTabela(resultado[i]);
+            }
+        }
+    });
+
+    $(document).on('change', '#filtro-status, #filtro-prioridade', function () {
+        $('#tabela-tarefas tbody').empty();
+        for (var i = 0; i < tarefas.length; i++) {
+            adicionarLinhaTabela(tarefas[i]);
         }
     });
 
     $('#titulo').on('keyup', function () {
         if ($(this).val().trim() !== '') {
-            $('#erro-titulo').text('').removeClass('visivel');
+            $('#erro-titulo').text('');
+            $('#erro-titulo').removeClass('visivel');
             $(this).removeClass('input-erro');
         }
     });
@@ -175,14 +177,13 @@ function criarSecaoLista() {
 }
 
 function montarLinha(tarefa) {
-    var badgePrio = prioridadeBadge[tarefa.prioridade];
-    if (!badgePrio) {
+    var badgePrio;
+    if (tarefa.prioridade === 'Baixa') {
         badgePrio = 'badge-prio-baixa';
-    }
-
-    var labelPrio = prioridadeLabel[tarefa.prioridade];
-    if (!labelPrio) {
-        labelPrio = tarefa.prioridade;
+    } else if (tarefa.prioridade === 'Media') {
+        badgePrio = 'badge-prio-media';
+    } else {
+        badgePrio = 'badge-prio-alta';
     }
 
     var badgeStatus;
@@ -199,22 +200,30 @@ function montarLinha(tarefa) {
         dataFormatada = '-';
     }
 
-    var tituloEsc = $('<span>').text(tarefa.titulo).prop('outerHTML');
-    var descEsc   = $('<span>').text(tarefa.descricao || '-').prop('outerHTML');
-    var obsEsc    = $('<span>').text(tarefa.observacao || '-').prop('outerHTML');
+    var descricao = tarefa.descricao;
+    if (!descricao) {
+        descricao = '-';
+    }
 
-    return '<tr data-id="' + tarefa.id + '">' +
-        '<td>' + tituloEsc + '</td>' +
-        '<td>' + descEsc + '</td>' +
-        '<td><span class="' + badgePrio + '">' + labelPrio + '</span></td>' +
-        '<td>' + dataFormatada + '</td>' +
-        '<td><span class="' + badgeStatus + '">' + tarefa.status + '</span></td>' +
-        '<td>' + obsEsc + '</td>' +
-        '<td>' +
-            '<button class="btn btn-warning btn-sm btn-editar" data-id="' + tarefa.id + '">Editar</button> ' +
-            '<button class="btn btn-danger btn-sm btn-excluir" data-id="' + tarefa.id + '">Excluir</button>' +
-        '</td>' +
-    '</tr>';
+    var observacao = tarefa.observacao;
+    if (!observacao) {
+        observacao = '-';
+    }
+
+    var html = '<tr data-id="' + tarefa.id + '">';
+    html += '<td>' + tarefa.titulo + '</td>';
+    html += '<td>' + descricao + '</td>';
+    html += '<td><span class="' + badgePrio + '">' + tarefa.prioridade + '</span></td>';
+    html += '<td>' + dataFormatada + '</td>';
+    html += '<td><span class="' + badgeStatus + '">' + tarefa.status + '</span></td>';
+    html += '<td>' + observacao + '</td>';
+    html += '<td>';
+    html += '<button class="btn btn-warning btn-sm btn-editar" data-id="' + tarefa.id + '">Editar</button> ';
+    html += '<button class="btn btn-danger btn-sm btn-excluir" data-id="' + tarefa.id + '">Excluir</button>';
+    html += '</td>';
+    html += '</tr>';
+
+    return html;
 }
 
 function adicionarLinhaTabela(tarefa) {
@@ -250,23 +259,24 @@ function carregarTarefaNoFormulario(id) {
 
     if (tarefa.observacao) {
         if ($('#campo-observacao').length === 0) {
-            var novoCampo = $(
+            $('#campo-observacao-container').append(
                 '<div id="campo-observacao" class="mb-3">' +
                     '<label class="form-label">Observacao</label>' +
                     '<textarea id="observacao" class="form-control" rows="2"></textarea>' +
                 '</div>'
             );
-            $('#campo-observacao-container').append(novoCampo);
-            $('#btn-observacao').text('- Observacao');
+            $('#btn-observacao').addClass('btn-ativo');
         }
         $('#observacao').val(tarefa.observacao);
     } else {
         $('#campo-observacao').remove();
-        $('#btn-observacao').text('+ Observacao');
+        $('#btn-observacao').removeClass('btn-ativo');
     }
 
     $('#titulo-form').text('Editando Tarefa');
-    $('#btn-concluir').text('Atualizar').removeClass('btn-success').addClass('btn-primary');
+    $('#btn-concluir').text('Atualizar');
+    $('#btn-concluir').removeClass('btn-success');
+    $('#btn-concluir').addClass('btn-primary');
 
     $('html, body').animate({ scrollTop: 0 }, 300);
 }
@@ -274,11 +284,14 @@ function carregarTarefaNoFormulario(id) {
 function limparFormulario() {
     $('#form-tarefa')[0].reset();
     $('#campo-observacao').remove();
-    $('#btn-observacao').text('+ Observacao');
-    $('#erro-titulo').text('').removeClass('visivel');
+    $('#btn-observacao').removeClass('btn-ativo');
+    $('#erro-titulo').text('');
+    $('#erro-titulo').removeClass('visivel');
     $('#titulo').removeClass('input-erro');
     $('#titulo-form').text('Nova Tarefa');
-    $('#btn-concluir').text('Concluir').removeClass('btn-primary').addClass('btn-success');
+    $('#btn-concluir').text('Concluir');
+    $('#btn-concluir').removeClass('btn-primary');
+    $('#btn-concluir').addClass('btn-success');
 }
 
 function atualizarContadorNav() {
