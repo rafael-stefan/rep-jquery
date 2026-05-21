@@ -24,11 +24,11 @@ function adicionarTarefa(dados) {
     var novaTarefa = {
         id: contadorId,
         titulo: dados.titulo,
-        descricao: dados.descricao || '',
+        descricao: dados.descricao,
         prioridade: dados.prioridade,
-        dataLimite: dados.dataLimite || '',
+        dataLimite: dados.dataLimite,
         status: dados.status,
-        observacao: dados.observacao || ''
+        observacao: dados.observacao
     };
     tarefas.push(novaTarefa);
     salvarTarefas();
@@ -41,11 +41,11 @@ function atualizarTarefa(id, dadosAtualizados) {
         tarefas[index] = {
             id: tarefas[index].id,
             titulo: dadosAtualizados.titulo,
-            descricao: dadosAtualizados.descricao || '',
+            descricao: dadosAtualizados.descricao,
             prioridade: dadosAtualizados.prioridade,
-            dataLimite: dadosAtualizados.dataLimite || '',
+            dataLimite: dadosAtualizados.dataLimite,
             status: dadosAtualizados.status,
-            observacao: dadosAtualizados.observacao || ''
+            observacao: dadosAtualizados.observacao
         };
         salvarTarefas();
         return tarefas[index];
