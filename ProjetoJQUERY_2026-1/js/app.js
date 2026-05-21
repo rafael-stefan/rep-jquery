@@ -1,14 +1,6 @@
-// ============================================================
-// PARTE A - JavaScript PURO
-// Responsavel por: estado da aplicacao, logica de negocio,
-// funcoes CRUD e persistencia no localStorage
-// ============================================================
-
 var tarefas = [];
 var editandoId = null;
 var contadorId = 0;
-
-// --- Persistencia (localStorage) ---
 
 function salvarTarefas() {
     localStorage.setItem('tarefas', JSON.stringify(tarefas));
@@ -26,8 +18,6 @@ function carregarTarefas() {
         contadorId = parseInt(contadorSalvo);
     }
 }
-
-// --- CRUD de tarefas ---
 
 function adicionarTarefa(dados) {
     contadorId++;
@@ -80,7 +70,6 @@ function getTarefaById(id) {
     return tarefas.find(function(t) { return t.id === id; });
 }
 
-// Controle de estado da edicao
 function setEditandoId(id) {
     editandoId = id;
 }

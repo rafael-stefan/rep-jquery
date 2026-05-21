@@ -1,25 +1,11 @@
-// ============================================================
-// PARTE B - jQuery
-// Responsavel por: manipulacao do DOM, eventos, interface visual
-// Usa: append, html, remove, addClass, removeClass, toggleClass
-// Eventos: submit, click, dblclick, change | Delegacao com on()
-// ============================================================
-
 var prioridadeLabel = { Baixa: 'Baixa', Media: 'Media', Alta: 'Alta' };
 var prioridadeBadge = {
     Baixa: 'badge-prio-baixa',
     Media: 'badge-prio-media',
     Alta:  'badge-prio-alta'
 };
-var prioridadeIcone = {
-    Baixa: 'bi-arrow-down-circle-fill text-success',
-    Media: 'bi-dash-circle-fill text-warning',
-    Alta:  'bi-arrow-up-circle-fill text-danger'
-};
 
 $(function () {
-
-    // Carrega tarefas salvas (JS puro) e renderiza via jQuery
     carregarTarefas();
     atualizarContadorNav();
     if (tarefas.length > 0) {
@@ -29,34 +15,27 @@ $(function () {
         });
     }
 
-    // --- Botao "+ Observacao" - cria campo dinamicamente ---
     $('#btn-observacao').on('click', function () {
         if ($('#campo-observacao').length === 0) {
             var novoCampo = $(
-                '<div id="campo-observacao">' +
-                    '<label><i class="bi bi-chat-square-text me-1"></i>Observacao</label>' +
+                '<div id="campo-observacao" class="mb-3">' +
+                    '<label class="form-label">Observacao</label>' +
                     '<textarea id="observacao" class="form-control" rows="2" placeholder="Digite uma observacao..."></textarea>' +
                 '</div>'
             );
             $('#campo-observacao-container').append(novoCampo);
-            $(this)
-                .html('<i class="bi bi-x-circle me-1"></i>- Observacao')
-                .addClass('btn-obs-ativo');
+            $(this).text('- Observacao');
         } else {
             $('#campo-observacao').remove();
-            $(this)
-                .html('<i class="bi bi-chat-left-text me-1"></i>+ Observacao')
-                .removeClass('btn-obs-ativo');
+            $(this).text('+ Observacao');
         }
     });
 
-    // --- Submit do formulario ---
     $('#form-tarefa').on('submit', function (e) {
         e.preventDefault();
 
         var titulo = $('#titulo').val().trim();
 
-        // Validacao sem alert
         if (!titulo) {
             $('#erro-titulo').text('O titulo e obrigatorio!').addClass('visivel');
             $('#titulo').addClass('input-erro');
@@ -65,22 +44,25 @@ $(function () {
         $('#erro-titulo').text('').removeClass('visivel');
         $('#titulo').removeClass('input-erro');
 
+        var observacao = '';
+        if ($('#observacao').length > 0) {
+            observacao = $('#observacao').val().trim();
+        }
+
         var dados = {
             titulo:     titulo,
             descricao:  $('#descricao').val().trim(),
             prioridade: $('#prioridade').val(),
             dataLimite: $('#dataLimite').val(),
             status:     $('#status').val(),
-            observacao: $('#observacao').length > 0 ? $('#observacao').val().trim() : ''
+            observacao: observacao
         };
 
         if (getEditandoId() !== null) {
-            // Atualiza (JS puro) + atualiza linha (jQuery)
             var tarefaAtualizada = atualizarTarefa(getEditandoId(), dados);
             atualizarLinhaTabela(tarefaAtualizada);
             limparEditandoId();
         } else {
-            // Adiciona (JS puro) + renderiza (jQuery)
             var novaTarefa = adicionarTarefa(dados);
             if ($('#tabela-tarefas').length === 0) {
                 criarSecaoLista();
@@ -92,50 +74,38 @@ $(function () {
         limparFormulario();
     });
 
-    // --- Delegacao de eventos para elementos dinamicos ---
-
-    // Excluir
     $(document).on('click', '.btn-excluir', function () {
-        var id   = parseInt($(this).data('id'));
+        var id = parseInt($(this).data('id'));
         var linha = $(this).closest('tr');
-
-        linha.addClass('removendo');
-        setTimeout(function () {
-            linha.remove();
-            excluirTarefa(id);
-            atualizarContadorNav();
-            if ($('#tabela-tarefas tbody tr').length === 0) {
-                $('#secao-lista').empty();
-            }
-        }, 350);
+        linha.remove();
+        excluirTarefa(id);
+        atualizarContadorNav();
+        if ($('#tabela-tarefas tbody tr').length === 0) {
+            $('#secao-lista').empty();
+        }
     });
 
-    // Editar - botao
     $(document).on('click', '.btn-editar', function () {
         var id = parseInt($(this).data('id'));
         carregarTarefaNoFormulario(id);
     });
 
-    // Editar - duplo clique na linha
     $(document).on('dblclick', '#tabela-tarefas tbody tr', function () {
         var id = parseInt($(this).data('id'));
         carregarTarefaNoFormulario(id);
     });
 
-    // Filtrar
     $(document).on('click', '#btn-filtrar', function () {
         var statusFiltro     = $('#filtro-status').val();
         var prioridadeFiltro = $('#filtro-prioridade').val();
 
-        var resultado = filtrarTarefas(statusFiltro, prioridadeFiltro); // JS puro
+        var resultado = filtrarTarefas(statusFiltro, prioridadeFiltro);
 
         $('#tabela-tarefas tbody').empty();
 
         if (resultado.length === 0) {
             $('#tabela-tarefas tbody').html(
-                '<tr><td colspan="7" class="sem-resultados">' +
-                '<i class="bi bi-search me-2"></i>Nenhuma tarefa encontrada com esses filtros.' +
-                '</td></tr>'
+                '<tr><td colspan="7" class="sem-resultados">Nenhuma tarefa encontrada com esses filtros.</td></tr>'
             );
         } else {
             $.each(resultado, function (i, tarefa) {
@@ -144,15 +114,6 @@ $(function () {
         }
     });
 
-    // Change nos filtros - efeito visual
-    $(document).on('change', '#filtro-status, #filtro-prioridade', function () {
-        $('#tabela-tarefas').addClass('filtrando');
-        setTimeout(function () {
-            $('#tabela-tarefas').removeClass('filtrando');
-        }, 400);
-    });
-
-    // Remove erro ao digitar
     $('#titulo').on('keyup', function () {
         if ($(this).val().trim() !== '') {
             $('#erro-titulo').text('').removeClass('visivel');
@@ -162,53 +123,47 @@ $(function () {
 
 });
 
-// --- Funcoes de interface (jQuery) ---
-
 function criarSecaoLista() {
     var htmlCard =
-        '<div class="card shadow-sm card-filtros mb-3">' +
-            '<div class="card-header d-flex align-items-center gap-2">' +
-                '<i class="bi bi-funnel-fill"></i> Filtros' +
-            '</div>' +
+        '<div class="card mb-3">' +
+            '<div class="card-header">Filtros</div>' +
             '<div class="card-body">' +
                 '<div class="row g-2 align-items-end">' +
                     '<div class="col-sm-4">' +
-                        '<label class="form-label fw-semibold" style="font-size:0.82rem">Status</label>' +
+                        '<label class="form-label">Status</label>' +
                         '<select id="filtro-status" class="form-select form-select-sm">' +
-                            '<option value="">Todos os status</option>' +
+                            '<option value="">Todos</option>' +
                             '<option value="Pendente">Pendente</option>' +
                             '<option value="Concluida">Concluida</option>' +
                         '</select>' +
                     '</div>' +
                     '<div class="col-sm-4">' +
-                        '<label class="form-label fw-semibold" style="font-size:0.82rem">Prioridade</label>' +
+                        '<label class="form-label">Prioridade</label>' +
                         '<select id="filtro-prioridade" class="form-select form-select-sm">' +
-                            '<option value="">Todas as prioridades</option>' +
+                            '<option value="">Todas</option>' +
                             '<option value="Baixa">Baixa</option>' +
                             '<option value="Media">Media</option>' +
                             '<option value="Alta">Alta</option>' +
                         '</select>' +
                     '</div>' +
                     '<div class="col-sm-4">' +
-                        '<button id="btn-filtrar" class="btn btn-primary btn-sm w-100">' +
-                            '<i class="bi bi-search me-1"></i>Filtrar' +
-                        '</button>' +
+                        '<button id="btn-filtrar" class="btn btn-primary btn-sm w-100">Filtrar</button>' +
                     '</div>' +
                 '</div>' +
             '</div>' +
         '</div>' +
-        '<div class="card shadow-sm">' +
-            '<div class="tabela-wrapper">' +
-                '<table id="tabela-tarefas" class="table table-hover mb-0">' +
-                    '<thead>' +
+        '<div class="card">' +
+            '<div class="card-body p-0">' +
+                '<table id="tabela-tarefas" class="table table-bordered table-hover mb-0">' +
+                    '<thead class="table-dark">' +
                         '<tr>' +
-                            '<th><i class="bi bi-tag me-1"></i>Titulo</th>' +
-                            '<th><i class="bi bi-card-text me-1"></i>Descricao</th>' +
-                            '<th><i class="bi bi-flag me-1"></i>Prioridade</th>' +
-                            '<th><i class="bi bi-calendar me-1"></i>Data Limite</th>' +
-                            '<th><i class="bi bi-circle-half me-1"></i>Status</th>' +
-                            '<th><i class="bi bi-chat me-1"></i>Observacao</th>' +
-                            '<th><i class="bi bi-gear me-1"></i>Acoes</th>' +
+                            '<th>Titulo</th>' +
+                            '<th>Descricao</th>' +
+                            '<th>Prioridade</th>' +
+                            '<th>Data Limite</th>' +
+                            '<th>Status</th>' +
+                            '<th>Observacao</th>' +
+                            '<th>Acoes</th>' +
                         '</tr>' +
                     '</thead>' +
                     '<tbody></tbody>' +
@@ -220,45 +175,44 @@ function criarSecaoLista() {
 }
 
 function montarLinha(tarefa) {
-    var badgePrio   = prioridadeBadge[tarefa.prioridade] || 'badge-prio-baixa';
-    var icone       = prioridadeIcone[tarefa.prioridade] || '';
-    var labelPrio   = prioridadeLabel[tarefa.prioridade]  || tarefa.prioridade;
-    var badgeStatus = tarefa.status === 'Concluida' ? 'badge-concluida' : 'badge-pendente';
-    var iconeStatus = tarefa.status === 'Concluida'
-        ? '<i class="bi bi-check-circle-fill me-1"></i>'
-        : '<i class="bi bi-clock me-1"></i>';
+    var badgePrio = prioridadeBadge[tarefa.prioridade];
+    if (!badgePrio) {
+        badgePrio = 'badge-prio-baixa';
+    }
 
-    var dataFormatada = tarefa.dataLimite
-        ? tarefa.dataLimite.split('-').reverse().join('/')
-        : '<span class="text-muted">-</span>';
+    var labelPrio = prioridadeLabel[tarefa.prioridade];
+    if (!labelPrio) {
+        labelPrio = tarefa.prioridade;
+    }
 
-    // Escapa conteudo do usuario com jQuery
+    var badgeStatus;
+    if (tarefa.status === 'Concluida') {
+        badgeStatus = 'badge-concluida';
+    } else {
+        badgeStatus = 'badge-pendente';
+    }
+
+    var dataFormatada;
+    if (tarefa.dataLimite) {
+        dataFormatada = tarefa.dataLimite.split('-').reverse().join('/');
+    } else {
+        dataFormatada = '-';
+    }
+
     var tituloEsc = $('<span>').text(tarefa.titulo).prop('outerHTML');
     var descEsc   = $('<span>').text(tarefa.descricao || '-').prop('outerHTML');
     var obsEsc    = $('<span>').text(tarefa.observacao || '-').prop('outerHTML');
 
     return '<tr data-id="' + tarefa.id + '">' +
-        '<td class="fw-semibold">' + tituloEsc + '</td>' +
-        '<td class="text-muted">' + descEsc + '</td>' +
-        '<td>' +
-            '<span class="' + badgePrio + '">' +
-                '<i class="bi ' + icone + ' me-1"></i>' + labelPrio +
-            '</span>' +
-        '</td>' +
+        '<td>' + tituloEsc + '</td>' +
+        '<td>' + descEsc + '</td>' +
+        '<td><span class="' + badgePrio + '">' + labelPrio + '</span></td>' +
         '<td>' + dataFormatada + '</td>' +
+        '<td><span class="' + badgeStatus + '">' + tarefa.status + '</span></td>' +
+        '<td>' + obsEsc + '</td>' +
         '<td>' +
-            '<span class="' + badgeStatus + '">' + iconeStatus + tarefa.status + '</span>' +
-        '</td>' +
-        '<td class="text-muted">' + obsEsc + '</td>' +
-        '<td>' +
-            '<div class="d-flex gap-1">' +
-                '<button class="btn btn-editar btn-editar-row" data-id="' + tarefa.id + '">' +
-                    '<i class="bi bi-pencil me-1"></i>Editar' +
-                '</button>' +
-                '<button class="btn btn-excluir btn-excluir-row" data-id="' + tarefa.id + '">' +
-                    '<i class="bi bi-trash me-1"></i>Excluir' +
-                '</button>' +
-            '</div>' +
+            '<button class="btn btn-warning btn-sm btn-editar" data-id="' + tarefa.id + '">Editar</button> ' +
+            '<button class="btn btn-danger btn-sm btn-excluir" data-id="' + tarefa.id + '">Excluir</button>' +
         '</td>' +
     '</tr>';
 }
@@ -273,26 +227,21 @@ function adicionarLinhaTabela(tarefa) {
 
 function atualizarLinhaTabela(tarefa) {
     var linhaAntiga = $('tr[data-id="' + tarefa.id + '"]');
-    var novaLinha   = $(montarLinha(tarefa));
+    var novaLinha = $(montarLinha(tarefa));
 
     if (tarefa.status === 'Concluida') {
         novaLinha.addClass('linha-concluida');
     }
 
     linhaAntiga.replaceWith(novaLinha);
-    novaLinha.addClass('linha-atualizada');
-    setTimeout(function () {
-        novaLinha.removeClass('linha-atualizada');
-    }, 1300);
 }
 
 function carregarTarefaNoFormulario(id) {
-    var tarefa = getTarefaById(id); // JS puro
+    var tarefa = getTarefaById(id);
     if (!tarefa) return;
 
-    setEditandoId(id); // JS puro controla estado
+    setEditandoId(id);
 
-    // jQuery popula o formulario
     $('#titulo').val(tarefa.titulo);
     $('#descricao').val(tarefa.descricao);
     $('#prioridade').val(tarefa.prioridade);
@@ -302,30 +251,22 @@ function carregarTarefaNoFormulario(id) {
     if (tarefa.observacao) {
         if ($('#campo-observacao').length === 0) {
             var novoCampo = $(
-                '<div id="campo-observacao">' +
-                    '<label><i class="bi bi-chat-square-text me-1"></i>Observacao</label>' +
+                '<div id="campo-observacao" class="mb-3">' +
+                    '<label class="form-label">Observacao</label>' +
                     '<textarea id="observacao" class="form-control" rows="2"></textarea>' +
                 '</div>'
             );
             $('#campo-observacao-container').append(novoCampo);
-            $('#btn-observacao')
-                .html('<i class="bi bi-x-circle me-1"></i>- Observacao')
-                .addClass('btn-obs-ativo');
+            $('#btn-observacao').text('- Observacao');
         }
         $('#observacao').val(tarefa.observacao);
     } else {
         $('#campo-observacao').remove();
-        $('#btn-observacao')
-            .html('<i class="bi bi-chat-left-text me-1"></i>+ Observacao')
-            .removeClass('btn-obs-ativo');
+        $('#btn-observacao').text('+ Observacao');
     }
 
-    // Atualiza cabecalho e botao
-    $('#titulo-form')
-        .html('<i class="bi bi-pencil-square me-2" style="color:#a5b4fc"></i>Editando Tarefa');
-    $('#btn-concluir')
-        .html('<i class="bi bi-arrow-repeat me-1"></i>Atualizar')
-        .removeClass('btn-success').addClass('btn-primary');
+    $('#titulo-form').text('Editando Tarefa');
+    $('#btn-concluir').text('Atualizar').removeClass('btn-success').addClass('btn-primary');
 
     $('html, body').animate({ scrollTop: 0 }, 300);
 }
@@ -333,20 +274,22 @@ function carregarTarefaNoFormulario(id) {
 function limparFormulario() {
     $('#form-tarefa')[0].reset();
     $('#campo-observacao').remove();
-    $('#btn-observacao')
-        .html('<i class="bi bi-chat-left-text me-1"></i>+ Observacao')
-        .removeClass('btn-obs-ativo');
+    $('#btn-observacao').text('+ Observacao');
     $('#erro-titulo').text('').removeClass('visivel');
     $('#titulo').removeClass('input-erro');
-    $('#titulo-form')
-        .html('<i class="bi bi-pencil-square me-2" style="color:#a5b4fc"></i>Nova Tarefa');
-    $('#btn-concluir')
-        .html('<i class="bi bi-check-circle me-1"></i>Concluir')
-        .removeClass('btn-primary').addClass('btn-success');
+    $('#titulo-form').text('Nova Tarefa');
+    $('#btn-concluir').text('Concluir').removeClass('btn-primary').addClass('btn-success');
 }
 
 function atualizarContadorNav() {
     var total = tarefas.length;
-    var texto = total === 0 ? '0 tarefas' : total + (total === 1 ? ' tarefa cadastrada' : ' tarefas cadastradas');
+    var texto;
+    if (total === 0) {
+        texto = '0 tarefas cadastradas';
+    } else if (total === 1) {
+        texto = '1 tarefa cadastrada';
+    } else {
+        texto = total + ' tarefas cadastradas';
+    }
     $('#contador-nav').text(texto);
 }
